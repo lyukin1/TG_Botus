@@ -147,7 +147,7 @@ def getrepllogs(update, context):
             with open(log_file_path, 'r', encoding='utf-8') as file:
                 for line in file:
                     lower_line = line.casefold()
-                    if 'repl' in lower_line or 'репл' in lower_line or 'checkpoint' in lower_line or 'точка' in lower_line:
+                    if 'repl' in lower_line or 'репл' in lower_line:
                         logs_message += line.rstrip() + "\n"
             if logs_message:
                 longmessage(update, logs_message)
