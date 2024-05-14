@@ -84,7 +84,6 @@ services:
       pg_ctl start -D /var/lib/postgresql/data
       tail -f /dev/null
       "
-
   bot_image:
     build:
       context: ./bot
