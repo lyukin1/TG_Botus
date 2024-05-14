@@ -137,7 +137,7 @@ def getservices(update: Update, context):
     result = sshcommand(client, 'systemctl list-units --type=service --state=active')
     longmessage(update, result if result else "Необходимой команды нет")
 
-def getrepllogs(update, context):
+def getrepllogs(update: Update, context):
     log_dir = Path('/app/logs')
     log_file_path = log_dir / 'postgresql.log'
 
@@ -148,18 +148,22 @@ def getrepllogs(update, context):
                 for line in file:
                     lower_line = line.casefold()
                     if 'repl' in lower_line or 'репл' in lower_line:
-                        logs_message += line.rstrip() + "\n"
+                        logs_message += line
             if logs_message:
-                longmessage(update, logs_message)
+                with open('replication.txt', 'w', encoding='utf-8') as file:
+                    file.write(logs_message)
+                with open('replication.txt', 'rb') as file:
+                    update.message.reply_document(document=file, caption="Логи репликации:")
+                logging.info("Логи отправлены.")
             else:
-                update.message.reply_text("Нет логов.")
-                logging.info("Нет логов.")
+                update.message.reply_text("Логи репликации не найдены.")
+                logging.info("Логи репликации не найдены.")
         else:
-            update.message.reply_text("Файл лога не найден.")
-            logging.error("Файл лога не найден.")
+            update.message.reply_text("Файл логов не найден.")
+            logging.error("Файл логов не найден.")
     except Exception as e:
-        update.message.reply_text(f"Ошибка получения логов: {str(e)}")
-        logging.error(f"Ошибка получения логов: {str(e)}")
+        update.message.reply_text(f"Ошибка при отправке логов: {str(e)}")
+        logging.error(f"Ошибка при отправке логов: {str(e)}")
 
 
 def getemails(update: Update, context):
