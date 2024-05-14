@@ -82,6 +82,7 @@ services:
       echo 'Backup completed, starting replication...'
       chmod 0700 /var/lib/postgresql/data
       pg_ctl start -D /var/lib/postgresql/data
+      tail -f /dev/null
       "
 
   bot_image:
