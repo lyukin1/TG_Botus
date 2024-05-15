@@ -221,18 +221,16 @@ def findPhoneNumbersCommand(update: Update, context):
 def findPhoneNumbers(update: Update, context):
     user_input = update.message.text
     phoneNumRegexs = [
-        re.compile(r'8 (\d{3}) \d{3}-\d{2}-\d{2}'),    # формат 8 (000) 000-00-00
-        re.compile(r'+7 (\d{3}) \d{3}-\d{2}-\d{2}'),  # формат +7 (000) 000-00-00
-        re.compile(r'8\d{10}'),                          # формат 80000000000
-        re.compile(r'+7\d{10}'),                        # формат +70000000000
-        re.compile(r'8(\d{3})\d{7}'),                  # формат 8(000)0000000
-        re.compile(r'+7(\d{3})\d{7}'),                # формат +7(000)0000000
-        re.compile(r'8 \d{3} \d{3} \d{2} \d{2}'),        # формат 8 000 000 00 00
-        re.compile(r'+7 \d{3} \d{3} \d{2} \d{2}'),      # формат +7 000 000 00 00
-        re.compile(r'8 (\d{3}) \d{3} \d{2} \d{2}'),    # формат 8 (000) 000 00 00
-        re.compile(r'+7 (\d{3}) \d{3} \d{2} \d{2}'),  # формат +7 (000) 000 00 00
-        re.compile(r'8-\d{3}-\d{3}-\d{2}-\d{2}'),        # формат 8-000-000-00-00
-        re.compile(r'+7-\d{3}-\d{3}-\d{2}-\d{2}')       # формат +7-000-000-00-00
+        re.compile(r'8\d{10}'),
+        re.compile(r'+7\d{10}'),
+        re.compile(r'8(\d{3})\d{7}'),
+        re.compile(r'+7(\d{3})\d{7}'),
+        re.compile(r'8 \d{3} \d{3} \d{2} \d{2}'),
+        re.compile(r'+7 \d{3} \d{3} \d{2} \d{2}'),
+        re.compile(r'8 (\d{3}) \d{3} \d{2} \d{2}'),
+        re.compile(r'+7 (\d{3}) \d{3} \d{2} \d{2}'),
+        re.compile(r'8-\d{3}-\d{3}-\d{2}-\d{2}'),
+        re.compile(r'+7-\d{3}-\d{3}-\d{2}-\d{2}')
         ]
     phoneNumberList = phoneNumRegex.findall(user_input)
 
