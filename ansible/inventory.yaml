@@ -1,13 +1,13 @@
 all:
   vars:
     DB_REPL_USER: repl_user
-    DB_REPL_PASSWORD: Qq12345
+    DB_REPL_PASSWORD: 
     POSTGRES_VERSION: 15 # меняем версию в зависимости от того, какая у нас устанавливается в системе
   hosts:
     host01:
       ansible_host: 192.168.0.14
       ansible_user: root
-      ansible_ssh_pass: luke
+      ansible_ssh_pass: 
 
       catalog: /root/ansible
       python_bot: https://github.com/lyukin1/TG_Botus
@@ -16,9 +16,9 @@ all:
       RM_PORT: 22
       RM_USER: kali
       DB_HOST: 192.168.0.14
-      RM_PASSWORD: kali
+      RM_PASSWORD: 
       DB_USER: postgres
-      DB_PASSWORD: Qq12345
+      DB_PASSWORD: 
       DB_PORT: 5432
       DB_DATABASE: tg_base
       DB_REPL_PORT: 5432
@@ -26,5 +26,5 @@ all:
     host02:
       ansible_host: 192.168.0.15
       ansible_user: root
-      ansible_ssh_pass: luke
+      ansible_ssh_pass: 
       DB_HOST: 192.168.0.14
