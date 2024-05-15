@@ -220,7 +220,7 @@ def findPhoneNumbersCommand(update: Update, context):
 
 def findPhoneNumbers(update: Update, context):
     user_input = update.message.text
-    phoneNumRegex = re.compile[
+    phoneNumRegex = [
                                 re.compile(r'8\d{10}'),
                                 re.compile(r'+7\d{10}'),
                                 re.compile(r'8(\d{3})\d{7}'),
