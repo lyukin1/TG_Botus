@@ -142,7 +142,7 @@ def getservices(update: Update, context):
 
 def getrepllogs(update: Update, context):
     log_dir = Path('/var/log/postgresql')
-    log_file_path = log_dir('postgresql.log')
+    log_file_path = log_dir / 'postgresql.log'
 
     try:
         if log_file_path.exists():
