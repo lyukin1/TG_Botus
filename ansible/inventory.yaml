@@ -7,18 +7,18 @@ all:
     host01:
       ansible_host: 192.168.0.14
       ansible_user: root
-      ansible_ssh_pass: 
+      ansible_ssh_pass: # прописываем необходимый пароль
 
       catalog: /root/ansible
       python_bot: https://github.com/lyukin1/TG_Botus
-      TOKEN: ''
+      TOKEN: '' # прописываем необходимый токен
       RM_HOST: 192.168.0.13
       RM_PORT: 22
       RM_USER: kali
       DB_HOST: 192.168.0.14
-      RM_PASSWORD: 
+      RM_PASSWORD: # прописываем необходимый пароль
       DB_USER: postgres
-      DB_PASSWORD: 
+      DB_PASSWORD: # прописываем необходимый пароль
       DB_PORT: 5432
       DB_DATABASE: tg_base
       DB_REPL_PORT: 5432
@@ -26,5 +26,5 @@ all:
     host02:
       ansible_host: 192.168.0.15
       ansible_user: root
-      ansible_ssh_pass: 
+      ansible_ssh_pass: # прописываем необходимый пароль
       DB_HOST: 192.168.0.14
