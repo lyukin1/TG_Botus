@@ -28,9 +28,6 @@ def setup_ssh_client(hostname, port, username, password):
 
 client = setup_ssh_client(rm_host, rm_port, rm_username, rm_password)
 
-log_path = '/var/log/myapp/logfile.txt'
-os.makedirs(os.path.dirname(log_path), exist_ok=True) 
-
 logging.basicConfig(
     filename='logfile.txt', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
