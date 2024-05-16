@@ -1,30 +1,33 @@
 all:
   vars:
     DB_REPL_USER: repl_user
-    DB_REPL_PASSWORD: 
+    DB_REPL_PASSWORD: Qq12345
     POSTGRES_VERSION: 15 # меняем версию в зависимости от того, какая у нас устанавливается в системе
   hosts:
+    localhost:
+      ansible_connection: local
+      ansible_become_password: luke # прописываем необходимый пароль
     host01:
-      ansible_host: 192.168.0.14
+      ansible_host: 192.168.0.23 # прописываем необходимый адрес
       ansible_user: root
-      ansible_ssh_pass: # прописываем необходимый пароль
+      ansible_ssh_pass: luke # прописываем необходимый пароль
 
       catalog: /root/ansible
       python_bot: https://github.com/lyukin1/TG_Botus
       TOKEN: '' # прописываем необходимый токен
-      RM_HOST: 192.168.0.13
+      RM_HOST: 192.168.0.13 # прописываем необходимый адрес
       RM_PORT: 22
       RM_USER: kali
-      DB_HOST: 192.168.0.14
-      RM_PASSWORD: # прописываем необходимый пароль
+      RM_PASSWORD: kali # прописываем необходимый пароль
+      DB_HOST: 192.168.0.23 #прописываем необходимый адрес
       DB_USER: postgres
-      DB_PASSWORD: # прописываем необходимый пароль
+      DB_PASSWORD: luke # прописываем необходимый пароль
       DB_PORT: 5432
       DB_DATABASE: tg_base
       DB_REPL_PORT: 5432
-      DB_REPL_HOST: 192.168.0.15
+      DB_REPL_HOST: 192.168.0.24 #прописываем необходимый адрес
     host02:
-      ansible_host: 192.168.0.15
+      ansible_host: 192.168.0.24 # прописываем необходимый адрес
       ansible_user: root
-      ansible_ssh_pass: # прописываем необходимый пароль
-      DB_HOST: 192.168.0.14
+      ansible_ssh_pass: luke # прописываем необходимый пароль
+      DB_HOST: 192.168.0.23 # прописываем необходимый адрес
