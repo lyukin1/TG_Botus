@@ -38,12 +38,6 @@
         owner: postgres
         group: postgres
         mode: '0644'
-    - name: Рестарт Postges
-      become: yes
-      service:
-        name: postgresql
-        state: restarted
-        enabled: yes    
     - name: create db
       become_user: postgres
       become: yes
@@ -109,26 +103,25 @@
         state: restarted
         enabled: yes
 
+
 - name: Репликация базы данных
   hosts: host02
   become: yes
   gather_facts: false
 
   tasks:
-    - name: Удаление файлов
+    - name: Очистка файлов
       command: rm -rf /var/lib/postgresql/"{{ hostvars[inventory_hostname]['POSTGRES_VERSION'] }}"/
-    - name: Создание репликации
+    - name: Бэкап
       command: pg_basebackup -R -h {{ hostvars[inventory_hostname]['DB_HOST'] }} -U {{ hostvars[inventory_hostname]['DB_REPL_USER'] }} -D /var/lib/postgresql/{{ hostvars[inventory_hostname]['POSTGRES_VERSION'] }}/main -P
       environment:
         PGPASSWORD: "{{ hostvars[inventory_hostname]['DB_REPL_PASSWORD'] }}"
     - name: Изменение прав доступа
       command: chown -R postgres:postgres /var/lib/postgresql/
-    - name: Рестарт Postges
-      become: yes
+    - name: Перезапуск postgresql
       service:
         name: postgresql
         state: restarted
-        enabled: yes 
 
 - name: Установка кода бота
   hosts: host01
