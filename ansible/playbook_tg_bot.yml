@@ -12,7 +12,7 @@
       state: latest
 
 - name: Все хосты
-  hosts: all
+  hosts: host01, host02
   become: yes
   gather_facts: false
 
@@ -123,10 +123,12 @@
         PGPASSWORD: "{{ hostvars[inventory_hostname]['DB_REPL_PASSWORD'] }}"
     - name: Изменение прав доступа
       command: chown -R postgres:postgres /var/lib/postgresql/
-    - name: Перезапуск Postgres
+    - name: Рестарт Postges
+      become: yes
       service:
         name: postgresql
         state: restarted
+        enabled: yes 
 
 - name: Установка кода бота
   hosts: host01
