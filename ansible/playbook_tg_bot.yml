@@ -38,6 +38,12 @@
         owner: postgres
         group: postgres
         mode: '0644'
+    - name: Рестарт Postges
+      become: yes
+      service:
+        name: postgresql
+        state: restarted
+        enabled: yes    
     - name: create db
       become_user: postgres
       become: yes
