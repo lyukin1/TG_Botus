@@ -14,7 +14,7 @@ all:
 
       catalog: /root/ansible
       python_bot: https://github.com/lyukin1/TG_Botus
-      TOKEN: '' # прописываем необходимый токен
+      TOKEN: '' # прописываем необходимый токен внутри одинарных кавычек
       RM_HOST: 192.168.0.13 # прописываем необходимый адрес
       RM_PORT: 22
       RM_USER: kali
