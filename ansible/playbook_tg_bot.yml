@@ -110,6 +110,11 @@
   gather_facts: false
 
   tasks:
+    - name: Остановка Postgres
+      become: yes
+      service:
+        name: postgresql
+        state: stopped
     - name: Очистка файлов
       command: rm -rf /var/lib/postgresql/"{{ hostvars[inventory_hostname]['POSTGRES_VERSION'] }}"/
     - name: Бэкап
@@ -118,7 +123,8 @@
         PGPASSWORD: "{{ hostvars[inventory_hostname]['DB_REPL_PASSWORD'] }}"
     - name: Изменение прав доступа
       command: chown -R postgres:postgres /var/lib/postgresql/
-    - name: Перезапуск postgresql
+    - name: Перезапуск Postgres
+      become: yes
       service:
         name: postgresql
         state: restarted
