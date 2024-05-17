@@ -1,0 +1,182 @@
+---
+- name: Ansible
+  hosts: localhost
+  become: yes
+  gather_facts: false
+
+  tasks:
+  - name: Установка sshpass
+    apt:
+      name:
+        - sshpass
+      state: latest
+
+- name: Все хосты
+  hosts: host01, host02
+  become: yes
+  gather_facts: false
+
+  tasks:
+    - name: Установка базы данных
+      apt:
+        name:
+          - postgresql
+          - postgresql-contrib
+          - libpq-dev
+        state: latest
+
+- name: Главная базы данных
+  hosts: host01
+  become: yes
+  gather_facts: false
+  
+  tasks:
+    - name: Configure pg_hba.conf
+      template:
+        src: pg_hba.conf
+        dest: /etc/postgresql/{{ hostvars[inventory_hostname]['POSTGRES_VERSION'] }}/main/pg_hba.conf
+        owner: postgres
+        group: postgres
+        mode: '0644'
+    - name: create db
+      become_user: postgres
+      become: yes
+      shell: |
+        psql -c "SELECT 1" -d {{ hostvars[inventory_hostname]['DB_DATABASE'] }} || psql -c "CREATE DATABASE {{ hostvars[inventory_hostname]['DB_DATABASE'] }}"
+    - name: create table
+      shell: |
+        set -e
+        psql -v ON_ERROR_STOP=1 --username "{{ hostvars[inventory_hostname]['DB_USER'] }}" --dbname "{{ hostvars[inventory_hostname]['DB_DATABASE'] }}" <<-EOSQL
+          ALTER USER "{{ hostvars[inventory_hostname]['DB_USER'] }}" WITH PASSWORD '{{ hostvars[inventory_hostname]['DB_PASSWORD'] }}';
+          DROP ROLE IF EXISTS {{ hostvars[inventory_hostname]['DB_REPL_USER'] }};
+          CREATE ROLE {{ hostvars[inventory_hostname]['DB_REPL_USER'] }} WITH REPLICATION LOGIN PASSWORD '{{ hostvars[inventory_hostname]['DB_REPL_PASSWORD'] }}';
+          CREATE TABLE IF NOT EXISTS phone (Phone_id SERIAL PRIMARY KEY, phone_number VARCHAR(18) NOT NULL);
+          CREATE TABLE IF NOT EXISTS mail (Mail_id SERIAL PRIMARY KEY, name_mail VARCHAR(255) NOT NULL);
+          INSERT INTO phone (phone_number) VALUES ('+7 (123) 456 78 90');
+          INSERT INTO mail (name_mail) VALUES ('test@test.com');
+        EOSQL
+      become_user: postgres
+      become: yes
+    - name: Создание архива
+      ansible.builtin.file:
+        path: /oracle/pg_data/archive
+        state: directory
+        owner: postgres
+        group: postgres
+        mode: 0775
+        recurse: yes
+    - name: Изменение конфигурационного файла
+      become: yes
+      become_user: postgres
+      blockinfile:
+        path: /etc/postgresql/{{hostvars[inventory_hostname]['POSTGRES_VERSION']}}/main/postgresql.conf
+        block: |
+          wal_level = replica
+          archive_command ='cp %p /oracle/pg_data/archive/%f'
+          archive_mode = on
+          wal_log_hints = on
+          hot_standby = on
+          max_wal_senders = 10
+          max_replication_slots = 10
+          hot_standby_feedback = on
+          listen_addresses = '*'
+          logging_collector = on
+          log_directory = '/var/log/postgresql'
+          log_filename = 'postgresql.log'
+          log_truncate_on_rotation = off
+          log_rotation_age = 0
+          log_rotation_size = 0
+          log_statement = all
+          log_replication_commands = on
+          log_min_messages = debug1
+          log_min_error_statement = debug1
+        backup: yes
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        create: yes
+        owner: postgres
+        group: postgres
+        mode: 0644
+    - name: Рестарт Postges
+      become: yes
+      service:
+        name: postgresql
+        state: restarted
+        enabled: yes
+
+
+- name: Репликация базы данных
+  hosts: host02
+  become: yes
+  gather_facts: false
+
+  tasks:
+    - name: Остановка Postgres
+      become: yes
+      service:
+        name: postgresql
+        state: stopped
+    - name: Очистка файлов
+      command: rm -rf /var/lib/postgresql/"{{ hostvars[inventory_hostname]['POSTGRES_VERSION'] }}"/
+    - name: Бэкап
+      command: pg_basebackup -R -h {{ hostvars[inventory_hostname]['DB_HOST'] }} -U {{ hostvars[inventory_hostname]['DB_REPL_USER'] }} -D /var/lib/postgresql/{{ hostvars[inventory_hostname]['POSTGRES_VERSION'] }}/main -P
+      environment:
+        PGPASSWORD: "{{ hostvars[inventory_hostname]['DB_REPL_PASSWORD'] }}"
+    - name: Изменение прав доступа
+      command: chown -R postgres:postgres /var/lib/postgresql/
+    - name: Перезапуск Postgres
+      become: yes
+      service:
+        name: postgresql
+        state: restarted
+
+- name: Установка кода бота
+  hosts: host01
+  become: yes
+  gather_facts: false
+
+  tasks:
+    - name: Обновление пакетов
+      become: true
+      apt:
+        update_cache: yes
+        upgrade: 'yes'
+    - name: apt
+      apt:
+        name:
+          - git
+          - python3
+          - python3-pip
+          - python3-venv
+        state: latest
+    - name: Создание папки
+      command: mkdir -p "{{hostvars[inventory_hostname]['catalog']}}/src"
+    - name: Клонирование с GitHub
+      git:
+        repo: "{{hostvars[inventory_hostname]['python_bot']}}"
+        dest: "{{hostvars[inventory_hostname]['catalog']}}/src"
+        version: main
+
+    - name: Создание виртуального окружения
+      ansible.builtin.command:
+        cmd: python3 -m venv myenv
+
+    - name: Установка необходимых пакетов
+      ansible.builtin.shell:
+        cmd: myenv/bin/pip install -r "{{hostvars[inventory_hostname]['catalog']}}/src/requirements.txt"
+      environment:
+        PATH: "myenv/bin:{{ ansible_env.PATH }}"
+
+    - name: Запуск бота
+      command: myenv/bin/python3 "{{ hostvars[inventory_hostname]['catalog'] }}/src/bot.py" &
+      environment:
+        TOKEN: "{{hostvars[inventory_hostname]['TOKEN'] }}"
+        RM_HOST: "{{hostvars[inventory_hostname]['RM_HOST'] }}"
+        RM_PORT: "{{hostvars[inventory_hostname]['RM_PORT'] }}"
+        RM_USER: "{{hostvars[inventory_hostname]['RM_USER'] }}"
+        RM_PASSWORD: "{{hostvars[inventory_hostname]['RM_PASSWORD'] }}"
+        DB_HOST: "{{hostvars[inventory_hostname]['DB_HOST'] }}"
+        DB_USER: "{{hostvars[inventory_hostname]['DB_USER'] }}"
+        DB_PASSWORD: "{{hostvars[inventory_hostname]['DB_PASSWORD'] }}"
+        DB_PORT: "{{hostvars[inventory_hostname]['DB_PORT'] }}"
+        DB_DATABASE: "{{hostvars[inventory_hostname]['DB_DATABASE'] }}"
+      become: true
