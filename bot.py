@@ -332,7 +332,7 @@ def main():
     dp = updater.dispatcher
 
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('find_phone_numbers', findPhoneNumbersCommand)],
+        entry_points=[CommandHandler('find_phone_number', findPhoneNumbersCommand)],
         states={
             FIND_NUMBERS: [MessageHandler(Filters.text & ~Filters.command, findPhoneNumbers)],
             CONFIRMATION: [MessageHandler(Filters.text & ~Filters.command, addPhoneNumbers)]
@@ -341,7 +341,7 @@ def main():
     )
 
     FindEmail = ConversationHandler(
-    entry_points=[CommandHandler('find_emails', findemailcommand)],
+    entry_points=[CommandHandler('find_email', findemailcommand)],
     states={
          FIND_EMAILS: [MessageHandler(Filters.text & ~Filters.command, findemails)],
          ADD_EMAILS: [MessageHandler(Filters.text & ~Filters.command, addemails)]
